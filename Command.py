@@ -29,16 +29,13 @@ def sendNotification():
 
     while True:
         try:
-            print('watch')
             curTime = time.time()
 
             conn = sqlite3.connect('data.db')
             c = conn.cursor()
-            print(f'SELECT ID, text, file from notification where time < {curTime} and sent is NULL')
             cursor = c.execute(f'SELECT ID, text, file from notification where time < {curTime} and sent is NULL')
             init = False
             data = cursor.fetchall()
-            print(data)
             for row in data:
                 ID = row[0]
                 text = row[1]
@@ -61,7 +58,7 @@ def sendNotification():
                 c.execute(f"UPDATE notification set sent = 1 where ID={ID}")
                 conn.commit()
             conn.close()
-            time.sleep(5)
+            time.sleep(600)
         except Exception as err:
             print('err:', err)
             break
@@ -106,7 +103,6 @@ def callback(update, bot):
     if isEnabled != cache.get(roomID, 'isNotificationEnabled'):
         conn = sqlite3.connect('data.db')
         c = conn.cursor()
-        print(f"UPDATE rooms set isEnabled = {isEnabled} where roomID={roomID}")
         c.execute(f"UPDATE rooms set isEnabled = {isEnabled} where roomID={roomID}")
         conn.commit()
         conn.close()

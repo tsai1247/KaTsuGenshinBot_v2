@@ -77,17 +77,17 @@ def setNotification(update, bot):
     ]
 
     curStatus = cache.get(roomID, 'isNotificationEnabled') == "1"
-    if curStatus == None:
+    if not curStatus:
         conn = sqlite3.connect('data.db')
         c = conn.cursor()
-        cursor = c.execute('SELECT COUNT(*) from rooms')
-        if cursor.fetchone()[0] == 0:
+        cursor = c.execute(f'SELECT isEnabled from rooms where roomID = {roomID}')
+        data = cursor.fetchall()
+        if len(data) == 0:
             c.execute(f"INSERT INTO rooms \
                 VALUES ({roomID}, {False})")
             conn.commit()
         else:
-            cursor = c.execute(f"SELECT isEnabled from rooms WHERE roomID = {roomID}")
-            curStatus = cursor.fetchone()[0]
+            curStatus = data[0][0]
 
         conn.close()
 

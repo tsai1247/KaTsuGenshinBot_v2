@@ -114,7 +114,8 @@ def callback(update, bot):
         conn.commit()
         conn.close()
         cache.set(roomID, 'isNotificationEnabled', isEnabled)
-    Message.Delete(roomID, cache.get(roomID, 'setNotificationMessage').message_id)
+    if cache.get(roomID, 'setNotificationMessage') != None:
+        Message.Delete(roomID, cache.get(roomID, 'setNotificationMessage').message_id)
     
     buttons = [
         [InlineKeyboardButton('True', callback_data=f"True {roomID}"), InlineKeyboardButton('False', callback_data=f"False {roomID}")]

@@ -97,9 +97,12 @@ def setNotification(update, bot):
 
 def callback(update, bot):
     isEnabled, roomID = update.callback_query.data.split()
-    isEnabled = isEnabled == 'True'
     roomID = int(roomID)
-    
+    isEnabled = isEnabled == 'True'
+    if cache.get(roomID, 'setNotificationMessage') == None:
+        update.callback_query.edit_message_text('bye')
+        return
+
     if isEnabled != cache.get(roomID, 'isNotificationEnabled'):
         conn = sqlite3.connect('data.db')
         c = conn.cursor()
@@ -114,8 +117,7 @@ def callback(update, bot):
         conn.commit()
         conn.close()
         cache.set(roomID, 'isNotificationEnabled', isEnabled)
-    if cache.get(roomID, 'setNotificationMessage') != None:
-        Message.Delete(roomID, cache.get(roomID, 'setNotificationMessage').message_id)
+    Message.Delete(roomID, cache.get(roomID, 'setNotificationMessage').message_id)
     
     buttons = [
         [InlineKeyboardButton('True', callback_data=f"True {roomID}"), InlineKeyboardButton('False', callback_data=f"False {roomID}")]

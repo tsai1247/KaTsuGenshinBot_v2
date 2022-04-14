@@ -103,7 +103,14 @@ def callback(update, bot):
     if isEnabled != cache.get(roomID, 'isNotificationEnabled'):
         conn = sqlite3.connect('data.db')
         c = conn.cursor()
-        c.execute(f"UPDATE rooms set isEnabled = {isEnabled} where roomID={roomID}")
+        
+        cursor = c.execute(f'SELECT isEnabled from rooms where roomID = {roomID}')
+        data = cursor.fetchall()
+        if len(data) == 0:
+            c.execute(f"INSERT INTO rooms \
+                VALUES ({roomID}, {isEnabled})")
+        else:
+            c.execute(f"UPDATE rooms set isEnabled = {isEnabled} where roomID={roomID}")
         conn.commit()
         conn.close()
         cache.set(roomID, 'isNotificationEnabled', isEnabled)
